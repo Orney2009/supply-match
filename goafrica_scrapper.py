@@ -6,6 +6,7 @@ import time
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from urllib.parse import urljoin
+from selenium.common.exceptions import NoSuchElementException
 
 BASE = "https://www.goafricaonline.com/bj/annuaire"
 
@@ -77,20 +78,23 @@ def get_entreprises(subcategories):
                     {
                         "name": entreprise.find_element(By.TAG_NAME, 'h2').text if entreprise.find_element(By.TAG_NAME, 'h2') else None,
                         "category": entreprise.find_element(By.CLASS_NAME, 'text-brand-blue').text if entreprise.find_element(By.CLASS_NAME, 'text-brand-blue') else None,
-                        "address": entreprise.find_element(By.TAG_NAME, 'address').text if entreprise.find_element(By.TAG_NAME, 'address') else None,
-                        "tel": entreprise.find_element(By.XPATH,".//i[contains(@class, 'tnp-smartphone-2')]//following-sibling::a").text.replace("Gsm: ", "").replace("(", "").replace(")", "").replace(" ", "") if entreprise.find_element(By.XPATH,".//i[contains(@class, 'tnp-smartphone-2')]//following-sibling::a") else None,
+                        "address": entreprise.find_element(By.TAG_NAME, 'address').text.replace("\n", " ") if entreprise.find_element(By.TAG_NAME, 'address') else None,
+                        "tel": entreprise.find_element(By.XPATH,".//i[contains(@class, 'tnp-smartphone-2')]//following-sibling::a").text.replace("Gsm: ", "").replace("(", "").replace(")", "").replace(" ", "") if len(entreprise.find_elements(By.XPATH,".//i[contains(@class, 'tnp-smartphone-2')]//following-sibling::a")) else None,
                         "description" : master.find_element(By.XPATH,"./child::div[4]").text if master.find_element(By.XPATH,"./child::div[4]") else None,          
                     }
                 )
-        return entreprises
+            print(entreprises)
+            save_to_csv(entreprises)
+        return entreprises    
     except Exception as e:
         print(f"Error on entreprises fetching: {e}")
 
+
 def save_to_csv(entreprises):
     try:
-        with open("goafrica_entreprises.csv", "w", newline="", encoding="utf-8") as f:
-            writer = csv.DictWriter(f, fieldnames=[entreprises[0].keys()])
-            writer.writeheader()
+        with open("goafrica_entreprises.csv", "a", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=['name', 'category', 'address', 'tel', 'description'])
+            # writer.writeheader()
             for e in entreprises:
                 writer.writerow({
                     "name": e["name"],
@@ -111,6 +115,12 @@ try:
     driver.get(BASE)
     wait = WebDriverWait(driver, 5)
 
+    try:
+        with open("goafrica_entreprises.csv", "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=['name', 'category', 'address', 'tel', 'description'])
+            writer.writeheader()            
+    except Exception as e:
+        print(f"Error on csv creation: {e}")
 
     #categories fetching
     categories = get_cat()
