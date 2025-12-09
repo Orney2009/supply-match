@@ -1,0 +1,4 @@
+install selenium
+	pip install selenium
+install web-driver (Chrome is recommended)	
+	
