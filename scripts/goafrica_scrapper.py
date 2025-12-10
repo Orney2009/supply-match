@@ -92,7 +92,7 @@ def get_entreprises(subcategories):
 
 def save_to_csv(entreprises):
     try:
-        with open("goafrica_entreprises.csv", "a", newline="", encoding="utf-8") as f:
+        with open("../data/raw/goafrica_entreprises.csv", "a", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=['name', 'category', 'address', 'tel', 'description'])
             # writer.writeheader()
             for e in entreprises:
@@ -116,7 +116,7 @@ try:
     wait = WebDriverWait(driver, 5)
 
     try:
-        with open("goafrica_entreprises.csv", "w", newline="", encoding="utf-8") as f:
+        with open("../data/raw/goafrica_entreprises.csv", "w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=['name', 'category', 'address', 'tel', 'description'])
             writer.writeheader()            
     except Exception as e:
