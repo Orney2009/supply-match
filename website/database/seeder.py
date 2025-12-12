@@ -23,6 +23,18 @@ for category in categories:
         Category(name=category)
     )
 
+
+for index, row in df.iterrows():
+    db.add(
+        Entreprise(
+            name=row['name'],
+
+        )
+    )
+
+# result = db.query(Category.id).filter(Category.name == 'Exploitation pétrolière').all()
+# print(result[0][0])
+
 db.commit()
 db.close()
 
