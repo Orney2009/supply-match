@@ -28,16 +28,15 @@ for index, row in df.iterrows():
     db.add(
         Entreprise(
             name=row['name'],
+            category_id=db.query(Category.id).filter(Category.name == row['category']).first()[0],
+            address=row['address'],
+            phone=row['tel'],
+            description=row['description']
 
         )
     )
 
-# result = db.query(Category.id).filter(Category.name == 'Exploitation pétrolière').all()
-# print(result[0][0])
-
 db.commit()
 db.close()
-
-# print(engine.url)
 
 
