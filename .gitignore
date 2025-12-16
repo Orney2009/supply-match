@@ -1,5 +1,6 @@
 mon_env
 .env
 website/database/__pycache__
+website/backend/__pycache__
 website/frontend/node_modules
 ecp/
