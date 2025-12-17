@@ -9,7 +9,6 @@ import Societe from './components/Societe.vue';
 <template>
   <Navbar/>  
   <Searchbar/>  
-  <Enterprises/>  
-  <Societe/>  
+  <Enterprises/>
   <Footer/>  
 </template>
