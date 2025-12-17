@@ -179,7 +179,7 @@ class Model:
         except Exception as e:
             print(f"An error occurs when processing the search:{e}")
         
-    def best_recommended_pme(self, search, nb_recommandations):
+    def best_recommanded_pme(self, search):
         try:
             
             # Récupération du vecteur du livre cible
@@ -197,7 +197,7 @@ class Model:
             recommandations.sort_values(by="Similarity", ascending=False, inplace=True)
 
             # Sélection des meilleurs résultats
-            result = recommandations.head(min(nb_recommandations, len(recommandations)))
+            result = recommandations
 
             if result.empty:
                 print("Aucune recommandation disponible.")
