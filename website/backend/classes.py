@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, make_response
+from flask import Flask, jsonify, make_response, request
 import os
 from dotenv import load_dotenv
 from flask_restful import Resource, Api
@@ -62,11 +62,15 @@ class Entreprises(Resource):
 
 class Recommandations(Resource):
     def get(self):        
-
+        model = Model()
+        query = request.json
+        print(query)
+        re = model.best_recommanded_pme(data)
+        names = [recom["name"] for recom in re]
         try:
             
-            entreprises = db.query(objects.Entreprise).all()
-        
+            entreprises = db.query(objects.Entreprise).filter(objects.Entreprise.name.in_(names)).all()
+            print(entreprises)
             result = []
             for entreprise in entreprises:                
                 result.append({
