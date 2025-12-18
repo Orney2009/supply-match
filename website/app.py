@@ -12,7 +12,7 @@ CORS(app)
 
         
 api.add_resource(Entreprises, '/')
-# api.add_resource(Item, '/<int:pk>')
+api.add_resource(Recommandations, '/search')
 
 if __name__ == '__main__':
     app.run(debug=True)
