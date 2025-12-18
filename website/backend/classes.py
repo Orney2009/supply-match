@@ -64,13 +64,12 @@ class Recommandations(Resource):
     def get(self):        
         model = Model()
         query = request.json
-        print(query)
-        re = model.best_recommanded_pme(data)
+        re = model.best_recommanded_pme(query["query"])
         names = [recom["name"] for recom in re]
+        
         try:
             
             entreprises = db.query(objects.Entreprise).filter(objects.Entreprise.name.in_(names)).all()
-            print(entreprises)
             result = []
             for entreprise in entreprises:                
                 result.append({
@@ -148,7 +147,7 @@ class Model:
         try:
             lem = WordNetLemmatizer()
             lemmans = df
-            lemmans["summary"] = df["summary"].map(lambda row: [ lem.lemmatize(word[0], pos = get_pos_tag(word[1])) for word in row ])
+            lemmans["summary"] = df["summary"].map(lambda row: [ lem.lemmatize(word[0], pos = self.get_pos_tag(word[1])) for word in row ])
         except Exception as e:
             print(f"An error occurs when lemmatizing: {e}")
         return lemmans    
@@ -201,7 +200,7 @@ class Model:
             recommandations.sort_values(by="Similarity", ascending=False, inplace=True)
 
             # Sélection des meilleurs résultats
-            result = recommandations
+            result = recommandations[recommandations["Similarity"] > 0.5]
 
             if result.empty:
                 print("Aucune recommandation disponible.")
@@ -213,7 +212,8 @@ class Model:
                 formatted_result.append({
                     "name" : recom[0],
                     "score" : recom[1]
-                })            
+                })
+      
             return formatted_result
         
         except Exception as e:
