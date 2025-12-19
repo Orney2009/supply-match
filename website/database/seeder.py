@@ -24,6 +24,9 @@ db.add(
 for category in categories:
     # print(f'Adding {category}')
     db.add(
+        Category(name="undefined")
+    )
+    db.add(
         Category(name=category)
     )
 
