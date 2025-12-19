@@ -18,4 +18,6 @@ class Entreprise(Base):
     phone = Column(String, nullable=False)
     description = Column(String)
     category_id = Column(Integer, ForeignKey('categories.id'), onupdate='CASCADE')
+    password_hashed = Column(String)
+    email = Column(String)
 

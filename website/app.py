@@ -12,6 +12,7 @@ CORS(app)
 
         
 api.add_resource(Entreprises, '/')
+api.add_resource(User, '/auth')
 api.add_resource(Recommandations, '/search')
 
 if __name__ == '__main__':
