@@ -1,7 +1,5 @@
 <template>
-  <Navbar/>  
-  <Register/>
-  <Login/>
+  <Navbar/> 
   <Searchbar @search="searchEntreprises"/>  
   <Enterprises :entreprises=entreprises :categories=categories />
   <Footer/>  
