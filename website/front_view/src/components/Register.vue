@@ -12,12 +12,12 @@
           Créer votre compte
         </h1>
 
-        <form class="space-y-4">          
+        <form class="space-y-4" @submit.prevent="handleSubmit">          
           <div>
             <label class="block mb-2 text-sm font-medium text-gray-900">
               Votre email
             </label>
-            <input  type="email" placeholder="johndoe@gmail.com" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg  focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
+            <input  type="email" placeholder="johndoe@gmail.com" v-model="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg  focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required/>
           </div>
 
 
@@ -25,7 +25,7 @@
             <label class="block mb-2 text-sm font-medium text-gray-900">
               Mot de passe
             </label>
-            <input type="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
+            <input type="password" v-model="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"  required/>
           </div>
 
         
@@ -33,7 +33,7 @@
             <label class="block mb-2 text-sm font-medium text-gray-900">
               Confirmez le mot de passe
             </label>
-            <input  type="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
+            <input  type="password" v-model="c_password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required/>
           </div>
 
          
@@ -53,5 +53,31 @@
   </section>
 </template>
 
-<script setup>
+<script >
+  import axios from 'axios';
+
+  export default{
+    name: 'Register',
+    data(){
+      return {
+        email:'',
+        password:'',
+        c_password:''
+      }
+    },
+    methods: {
+      async handleSubmit(){
+
+        const response = await axios.post ('register',{
+          email :this.email,
+          password : this.password,
+          c_password:  this.c_password
+        })
+
+
+        this.$router.push('/login')
+      }
+    },
+  }
+
 </script>

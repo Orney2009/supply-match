@@ -33,7 +33,7 @@
             Créer un compte
           </router-link>
 
-          <router-link to="/forgot-password" class="text-gray-500 hover:text-blue-600" >
+          <router-link to="/" class="text-gray-500 hover:text-blue-600" >
             Mot de passe oublié ?
           </router-link>
         </div>
