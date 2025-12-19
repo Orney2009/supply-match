@@ -63,8 +63,11 @@ class Entreprises(Resource):
 class Recommandations(Resource):
     def get(self):        
         model = Model()
-        query = request.json
-        re = model.best_recommanded_pme(query["query"])
+        
+
+        query = request.args.get('query')
+       
+        re = model.best_recommanded_pme(query)
         names = [recom["name"] for recom in re]
         
         try:
@@ -81,7 +84,7 @@ class Recommandations(Resource):
                     'description': entreprise.description
 
                 })
-
+            
             return make_response(jsonify(result), 200)
 
         except Exception as e:
