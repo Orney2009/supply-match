@@ -71,10 +71,26 @@
 
     methods:{
       async handleSubmit(){
+<<<<<<< HEAD
           const response = await axios.post('login',{
             email: this.email,
             password:this.password,
           })
+=======
+        try {                    
+          const response = await axios.post('login',{
+            email: this.email,
+            password: this.password,
+          });
+          
+          if (response.status == 200){
+            
+          }          
+          
+        } catch (error) {          
+          this.result = error.response.data.response
+        }
+>>>>>>> e360f71 (fix: corrects error hanlding when logging)
 
       }
     }
