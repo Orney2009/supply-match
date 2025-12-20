@@ -143,6 +143,9 @@ class UserLogin(Resource):
                         "response":"User successfully logged",
                         "token": access_token
                         }), 200)  
+                else:
+                    return make_response(jsonify({"response":"Email and password don't match"}), 401)  
+
 
         except EmailNotValidError as e:
             return make_response(jsonify({"response":"Invalid email"}), 400)
