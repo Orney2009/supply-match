@@ -66,10 +66,25 @@
 
     methods:{
       async handleSubmit(){
+        try {
+
           const response = await axios.post('login',{
             email: this.email,
-            password:this.password,
-          })
+            password: this.password,
+          });
+
+          console.log(response)
+          if (response.status == 200){
+            
+          }
+          else{
+            response.data.response
+          }
+
+          
+        } catch (error) {
+          
+        }
 
       }
     }
