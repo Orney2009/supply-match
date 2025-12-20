@@ -71,20 +71,10 @@
 
     methods:{
       async handleSubmit(){
-        try {                    
           const response = await axios.post('login',{
             email: this.email,
-            password: this.password,
-          });
-          
-          if (response.status == 200){            
-            this.$cookies.set("token", response.data.token, "1d")
-            this.$router.push("/")
-          }          
-          
-        } catch (error) {          
-          this.result = error.response.data.response
-        }
+            password:this.password,
+          })
 
       }
     }
