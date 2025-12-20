@@ -3,6 +3,7 @@ import { createApp } from 'vue'
 import './style.css'
 import App from './App.vue'
 import { routes } from './routes';
+import VueCookies from 'vue-cookies'
 import './axios'
 import VueAwesomePaginate from "vue-awesome-paginate"
 
@@ -15,4 +16,5 @@ const router = createRouter ({
 
 const app = createApp(App).use(VueAwesomePaginate);
 app.use(router);
+app.use(VueCookies);
 app.mount('#app');
