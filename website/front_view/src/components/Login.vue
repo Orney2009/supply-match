@@ -83,8 +83,9 @@
             password: this.password,
           });
           
-          if (response.status == 200){
-            
+          if (response.status == 200){            
+            this.$cookies.set("token", response.data.token, "1d")
+            this.$router.push("/")
           }          
           
         } catch (error) {          
