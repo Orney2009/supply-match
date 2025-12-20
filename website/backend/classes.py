@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, make_response, request
 from flask_restful import Resource, Api
+from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import create_access_token, jwt_required
 from email_validator import validate_email, EmailNotValidError
 from passlib.apps import custom_app_context as pwd_context
@@ -32,9 +33,11 @@ db = current_session()
 
 class Entreprises(Resource):
     def get(self):
-
+        offset = request.args.get("offset")
+        limit = request.args.get("limit")
+        print(limit)
         try:
-            entreprises = db.query(objects.Entreprise).all()
+            entreprises = db.query(objects.Entreprise).offset(offset).limit(limit).all()
             categories = db.query(objects.Category).all()
             ent_result = []
             cat_result = []
