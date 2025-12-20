@@ -12,6 +12,10 @@
           Créer votre compte
         </h1>
 
+        <div class="flex justify-center text-red-600 mb-5">
+          <span> {{ result }}</span>
+        </div>
+
         <form class="space-y-4" @submit.prevent="handleSubmit">          
           <div>
             <label class="block mb-2 text-sm font-medium text-gray-900">
@@ -62,20 +66,28 @@
       return {
         email:'',
         password:'',
-        c_password:''
+        c_password:'',
+        result: ''
       }
     },
     methods: {
       async handleSubmit(){
 
-        const response = await axios.post ('register',{
+        try {                    
+          const response = await axios.post ('register',{
           email :this.email,
           password : this.password,
           c_password:  this.c_password
-        })
-
-
-        this.$router.push('/login')
+          })
+          
+          if (response.status == 201){                        
+            this.$router.push("/")
+          }          
+          
+        } catch (error) {          
+          this.result = error.response.data.response
+        }
+                
       }
     },
   }
