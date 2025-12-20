@@ -17,6 +17,10 @@ df = pd.read_csv('artificial_intelligence/data/processed/processed_data.csv')
 
 categories = df['category'].unique()
 
+db.add(
+    Category(name="undefined")
+)
+
 for category in categories:
     # print(f'Adding {category}')
     db.add(
