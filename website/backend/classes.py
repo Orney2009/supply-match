@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, make_response, request
 from flask_restful import Resource, Api
+from sqlalchemy.orm import joinedload
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import create_access_token, jwt_required
 from email_validator import validate_email, EmailNotValidError
@@ -37,14 +38,12 @@ class Entreprises(Resource):
         limit = request.args.get("limit")
         print(limit)
         try:
-            entreprises = db.query(objects.Entreprise).offset(offset).limit(limit).all()
-            categories = db.query(objects.Category).all()
-            ent_result = []
-            cat_result = []
-            for entreprise in entreprises:                
+            entreprises = db.query(Entreprise, Category).join(Category, Entreprise.category_id == Category.id).offset(offset).limit(limit).all()                        
+            ent_result = []            
+            for entreprise, category in entreprises:                
                 ent_result.append({
                     'entreprise_id': entreprise.id,
-                    'category_id': entreprise.category_id,
+                    'category': category.name,
                     'name': entreprise.name,
                     'address': entreprise.address,
                     'phone': entreprise.phone,
@@ -52,15 +51,10 @@ class Entreprises(Resource):
 
                 })
 
-            for category in categories:                
-                cat_result.append({
-                    'id': category.id,
-                    'name': category.name
-                })
+            
 
             result = {
-                'entreprises' : ent_result,
-                'categories' : cat_result
+                'entreprises' : ent_result,                
             }
 
             return make_response(jsonify(result), 200)
