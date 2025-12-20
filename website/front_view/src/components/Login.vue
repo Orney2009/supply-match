@@ -67,9 +67,9 @@
     methods:{
       async handleSubmit(){
           const response = await axios.post('login',{
-            email = this.email,
-            password = this.password,
-          });
+            email: this.email,
+            password:this.password,
+          })
 
       }
     }
