@@ -11,6 +11,10 @@
           </p>
         </div>
 
+        <div class="flex justify-center text-red-600 mb-5">
+          <span> {{ result }}</span>
+        </div>
+
         <form @submit.prevent="handleSubmit">
           <div class="mb-4">
             <label class="block text-sm text-gray-600 mb-1">
@@ -60,30 +64,25 @@
     data() {
       return {
         email: '',
-        password:''
+        password:'',
+        result: ''
       }
     },
 
     methods:{
       async handleSubmit(){
-        try {
-
+        try {                    
           const response = await axios.post('login',{
             email: this.email,
             password: this.password,
           });
-
-          console.log(response)
+          
           if (response.status == 200){
             
-          }
-          else{
-            response.data.response
-          }
-
+          }          
           
-        } catch (error) {
-          
+        } catch (error) {          
+          this.result = error.response.data.response
         }
 
       }
