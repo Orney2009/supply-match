@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import create_access_token, jwt_required
 from email_validator import validate_email, EmailNotValidError
 from passlib.apps import custom_app_context as pwd_context
+import datetime
 
 
 import os
@@ -138,7 +139,7 @@ class UserLogin(Resource):
                 return make_response(jsonify({"response":"User not found"}), 404)  
             else:                    
                 if pwd_context.verify(str(body["password"]), user[0].password_hashed):
-                    access_token = create_access_token(identity=user[0].id)
+                    access_token = create_access_token(identity=user[0].id, expires_delta=datetime.timedelta(days=1))
                     return make_response(jsonify({
                         "response":"User successfully logged",
                         "token": access_token
