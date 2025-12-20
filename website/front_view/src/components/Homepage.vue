@@ -25,20 +25,20 @@
         <div class="flex justify-center md:justify-end">
           <div class="containers">
             <div class="hero-circle">
-              <img class="inner-img" src="https://images.unsplash.com/photo-1465414829459-d228b58caf6e" alt="" />
+              <img class="inner-img" src="../assets/image1.jpg" alt="" />
 
               <div class="hero-rotate">
                 <div class="planet">
-                  <img src="https://images.unsplash.com/photo-1465414829459-d228b58caf6e" />
+                  <img src="../assets/image1.jpg" />
                 </div>
                 <div class="planet">
-                  <img src="https://images.unsplash.com/uploads/1413142095961484763cf/d141726c" />
+                  <img src="../assets/image2.jpg"/>
                 </div>
                 <div class="planet">
-                  <img src="https://images.unsplash.com/photo-1484402628941-0bb40fc029e7" />
+                  <img src="../assets/image3.jpg" />
                 </div>
                 <div class="planet">
-                  <img src="https://images.unsplash.com/uploads/141310026617203b5980d/c86b8baa" />
+                  <img src="../assets/image4.jpg" />
                 </div>
               </div>
             </div>
@@ -54,7 +54,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div class="bg-gray-50 p-6 rounded-xl shadow hover:shadow-lg transition text-center">
-            <img src="../assets/vue.svg" alt="Recherche facile" class="w-16 h-16 mx-auto mb-4" />
+            <img src="../assets/rechercher.png" alt="Recherche facile" class="w-16 h-16 mx-auto mb-4" />
             <h3 class="text-xl font-semibold mb-2">Recherche facile</h3>
             <p class="text-gray-600">
               Trouver rapidement les entreprises béninoises par nom, secteur ou ville grâce à notre moteur de recherche
@@ -63,7 +63,7 @@
           </div>
 
           <div class="bg-gray-50 p-6 rounded-xl shadow hover:shadow-lg transition text-center">
-            <img src="../assets/vue.svg" alt="Création de profil" class="w-16 h-16 mx-auto mb-4" />
+            <img src="../assets/utilisateur.png" alt="Création de profil" class="w-16 h-16 mx-auto mb-4" />
             <h3 class="text-xl font-semibold mb-2">Création de profil</h3>
             <p class="text-gray-600">
               Permettre aux entreprises de se présenter, partager leurs services et rester visibles auprès des
@@ -72,7 +72,7 @@
           </div>
 
           <div class="bg-gray-50 p-6 rounded-xl shadow hover:shadow-lg transition text-center">
-            <img src="../assets/vue.svg" alt="Collaboration facile" class="w-16 h-16 mx-auto mb-4" />
+            <img src="../assets/collaboration.png" alt="Collaboration facile" class="w-16 h-16 mx-auto mb-4" />
             <h3 class="text-xl font-semibold mb-2">Collaboration & Opportunités</h3>
             <p class="text-gray-600">
               Faciliter les échanges, partenariats et transactions grâce aux outils intégrés de communication et
@@ -160,8 +160,8 @@ export default {
   transform: translate(-50%, -50%);
   overflow: hidden;
   border-radius: 10px;
-  width: 90px;
-  height: 90px;
+  width: 150px;
+  height: 120px; 
 }
 
 .hero-rotate {
