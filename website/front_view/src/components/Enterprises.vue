@@ -38,4 +38,6 @@ const props = defineProps({
   categories : Object
 })
 
+
+
 </script>
