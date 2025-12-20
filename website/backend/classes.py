@@ -1,9 +1,12 @@
 from flask import Flask, jsonify, make_response, request
+from flask_restful import Resource, Api
+from flask_jwt_extended import create_access_token, jwt_required
 from email_validator import validate_email, EmailNotValidError
 from passlib.apps import custom_app_context as pwd_context
+
+
 import os
 from dotenv import load_dotenv
-from flask_restful import Resource, Api
 from database import *
 
 import nltk
@@ -64,72 +67,92 @@ class Entreprises(Resource):
 
 class User(Resource):
     def get(self):
-
+        entreprise_id = request.json.get("id")
         try:
-            entreprises = db.query(objects.Entreprise).all()
-            categories = db.query(objects.Category).all()
-            ent_result = []
-            cat_result = []
-            for entreprise in entreprises:                
-                ent_result.append({
+            entreprise = db.query(objects.Entreprise).filter(objects.Entreprise.id == entreprise_id).all()
+            if len(entreprise) == 0 :
+                return make_response(jsonify({"response":"Entreprise not found"}), 404)  
+            else :
+                result = {
                     'entreprise_id': entreprise.id,
                     'category_id': entreprise.category_id,
                     'name': entreprise.name,
                     'address': entreprise.address,
                     'phone': entreprise.phone,
                     'description': entreprise.description
-
-                })
-
-            for category in categories:                
-                cat_result.append({
-                    'id': category.id,
-                    'name': category.name
-                })
-
-            result = {
-                'entreprises' : ent_result,
-                'categories' : cat_result
-            }
+                }            
 
             return make_response(jsonify(result), 200)
 
         except Exception as e:
             return jsonify({'error': str(e)}), 500
 
+    def post(self):        
+        pass
+
+    @jwt_required()
+    def put(self):
+        return make_response(jsonify({"response":"protected ressource"}), 200)
+
+
+class UserRegistration(Resource):
+    
     def post(self):
-        
         try:
             body = request.get_json()
             validate_email(body["email"], check_deliverability=False)
-            if len(body) == 2:
-                db.query(objects.Entreprise).filter(objects.Entreprise.email == body["email"])
-                pwd_context.verify(body["password"], )
-            elif  len(body) == 3:                
-                if body["password"] != body["c_password"]:
-                    return make_response(jsonify({"response":"The passwords doesn't match"}), 400)                                
-                else:
-                    db.add(
-                        Entreprise(
-                            name= " ",
-                            category_id= 1,
-                            address=" ",
-                            phone=" ",
-                            description=" ",
-                            password_hashed= pwd_context.encrypt(str(body["password"])),
-                            email = body["email"]
-                        )
+            user = db.query(objects.Entreprise).filter(objects.Entreprise.email == body["email"]).all()
+               
+            if (body["password"] != body["c_password"]) or body["password"] is None :
+                return make_response(jsonify({"response":"The passwords doesn't match or are empty"}), 400)                                
+            elif len(user) != 0:
+                return make_response(jsonify({"response":"This email is already taken"}), 400)                                
+
+            else:
+                db.add(
+                    Entreprise(
+                        name= " ",
+                        category_id= 1,
+                        address=" ",
+                        phone=" ",
+                        description=" ",
+                        password_hashed= pwd_context.encrypt(str(body["password"])),
+                        email = body["email"]
                     )
-                    db.commit()
-                    db.close()
-                    return make_response(jsonify({"response":"User created"}), 200)
+                )
+                db.commit()
+                db.close()
+                return make_response(jsonify({"response":"User created"}), 201)
+
+        except EmailNotValidError as e:
+            return make_response(jsonify({"response":"Invalid email"}), 401)
+
+        except Exception as e:
+            print(f"Something went wrong: {e}")
+
+class UserLogin(Resource):
+    def post(self):
+        try:
+            body = request.get_json()
+            validate_email(body["email"], check_deliverability=False)
+            user = db.query(objects.Entreprise).filter(objects.Entreprise.email == body["email"]).all()
+                                    
+            if len(user) == 0:
+                return make_response(jsonify({"response":"User not found"}), 404)  
+            else:                    
+                if pwd_context.verify(str(body["password"]), user[0].password_hashed):
+                    access_token = create_access_token(identity=user[0].id)
+                    return make_response(jsonify({
+                        "response":"User successfully logged",
+                        "token": access_token
+                        }), 200)  
 
         except EmailNotValidError as e:
             return make_response(jsonify({"response":"Invalid email"}), 400)
 
         except Exception as e:
             print(f"Something went wrong: {e}")
-
+        
 class Recommandations(Resource):
     def get(self):        
         model = Model()
