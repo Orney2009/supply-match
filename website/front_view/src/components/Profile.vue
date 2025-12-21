@@ -28,12 +28,12 @@
 
       <div>
         <label class="block mb-1 font-medium">Catégorie</label>
-        <select v-model="category_id" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required >
+        <select v-model="category" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required >
           <option value="" disabled>Sélectionnez une catégorie</option>
-          <option v-for="cat in categories" :key="cat.id" :value="cat.id">
+          <option v-for="cat in categories" :key="cat.id">
             {{ cat.name }}
           </option>
-        </select>
+        </select>        
       </div>
 
       <div class="text-center mt-6">
@@ -59,47 +59,70 @@ export default {
   name: 'Profile',
   data() {
     return {
-      name: '',
+      ent_name: '',
       description: '',
       address: '',
-      category_id: '',
+      category: '',
       phone:'',
-      categories: []
+      categories: [],
+      token: ''      
     };
   },
   methods: {
     async fetchCategories() {
-      try {
-        const response = await api.get('/');
+      try {        
+        const response = await api.get('/categories');
         this.categories = response.data.categories;
       } catch (error) {
         console.error("Erreur lors de la récupération des catégories :", error);
       }
     },
 
+    async fetchEntreprise() {
+      try {              
+        const response = await api.get(`/entreprise`);        
+        this.ent_name = response.data.name.trim()
+        this.description = response.data.description.trim()
+        this.address = response.data.address.trim()
+        this.phone = response.data.phone.trim()
+        this.category = response.data.category    
+      } catch (error) {
+        console.error("Erreur lors de la récupération des catégories :", error);
+      }
+    },
+
     async handleSubmit() {
-        const response = await axios.post('entreprise', {
-          name: this.ent_name,
-          description: this.description,
-          address: this.address,
-          category_id: this.category_id,
-          phone:this.phone
+        const index = this.categories.findIndex(obj => obj.name == this.category);        
+        const response = await api.put('/entreprise', {
+          name: this.ent_name.trim(),
+          description: this.description.trim(),
+          address: this.address.trim(),
+          category_id: this.categories[index]["category_id"],
+          phone:this.phone.trim()
         });
         console.log('Entreprise enregistrée :', response.data);
         alert('Profil enregistré avec succès !');
 
 
-        this.name = '';
-        this.description = '';
-        this.address = '';
-        this.category_id = '';
-        this.phone = '';
+        // this.name = '';
+        // this.description = '';
+        // this.address = '';
+        // this.category_id = '';
+        // this.phone = '';
     
-    }
+    },
   },
-  onMounted() {
-    this.fetchCategories();
+  mounted(){
+    this.fetchCategories()
+    this.fetchEntreprise()
+  },
+  beforeCreate(){
+    this.token = this.$cookies.get("token")
+    if(this.token == null){
+      this.$router.push("/login")
+    }
   }
 };
+
 
 </script>
