@@ -53,7 +53,11 @@ const searchEntreprises = async (query) => {
 
 const fetchEntreprises = async () => {
   try {
-    const response = await api.get("/");
+    const response = await api.get("/", {  
+      params:{
+        'id': $cookies.get("id")
+      }  
+    });
     
     entreprises.value = response.data.entreprises;    
 

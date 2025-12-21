@@ -55,31 +55,93 @@ class Categories(Resource):
 
 
 class Entreprises(Resource):
-    def get(self):
-        offset = request.args.get("offset")
-        limit = request.args.get("limit")        
-        try:
-            entreprises = db.query(Entreprise, Category).join(Category, Entreprise.category_id == Category.id).offset(offset).limit(limit).all()                        
-            ent_result = []            
-            for entreprise, category in entreprises:                
-                ent_result.append({
-                    'entreprise_id': entreprise.id,
-                    'category': category.name,
-                    'name': entreprise.name,
-                    'address': entreprise.address,
-                    'phone': entreprise.phone,
-                    'description': entreprise.description
+    def get(self):        
+        current_user_id = request.args.get("id")        
 
-                })
-            
-            result = {
-                'entreprises' : ent_result,                
-            }
+        if not current_user_id:
+            offset = request.args.get("offset")
+            limit = request.args.get("limit")
 
-            return make_response(jsonify(result), 200)
+            try:
+                entreprises = db.query(Entreprise, Category).join(Category, Entreprise.category_id == Category.id).offset(offset).limit(limit).all()                        
+                ent_result = []            
+                for entreprise, category in entreprises:                
+                    ent_result.append({
+                        'entreprise_id': entreprise.id,
+                        'category': category.name,
+                        'name': entreprise.name,
+                        'address': entreprise.address,
+                        'phone': entreprise.phone,
+                        'description': entreprise.description
 
-        except Exception as e:
-            return jsonify({'error': str(e)}), 500
+                    })
+                
+                result = {
+                    'entreprises' : ent_result,                
+                }
+
+                return make_response(jsonify(result), 200)
+
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
+        
+        else :            
+            try:                          
+                model = Model()
+                user = db.query(Entreprise, Category).join(Category, Entreprise.category_id == Category.id).filter(Entreprise.id == current_user_id).all()[0]
+                re = model.custom_display(user[0].description)
+                names = [recom["name"] for recom in re]
+                if len(names) != 0:                     
+                    ent_result = []
+                    for name in names:
+                        _entreprise = db.query(Entreprise, Category).join(Category, Entreprise.category_id == Category.id).filter(objects.Entreprise.name == name).all()
+                        for entreprise, category in _entreprise: 
+                            ent_result.append({
+                                'entreprise_id': entreprise.id,
+                                'category': category.name,
+                                'name': entreprise.name,
+                                'address': entreprise.address,
+                                'phone': entreprise.phone,
+                                'description': entreprise.description
+
+                            })
+                    
+                    result = {
+                        'entreprises' : ent_result,                
+                    }                    
+
+                    return make_response(jsonify(result), 200)
+
+                else:
+                    offset = request.args.get("offset")
+                    limit = request.args.get("limit")
+
+                    try:
+                        entreprises = db.query(Entreprise, Category).join(Category, Entreprise.category_id == Category.id).offset(offset).limit(limit).all()                        
+                        ent_result = []            
+                        for entreprise, category in entreprises:                
+                            ent_result.append({
+                                'entreprise_id': entreprise.id,
+                                'category': category.name,
+                                'name': entreprise.name,
+                                'address': entreprise.address,
+                                'phone': entreprise.phone,
+                                'description': entreprise.description
+
+                            })
+                        
+                        result = {
+                            'entreprises' : ent_result,                
+                        }                        
+
+                        return make_response(jsonify(result), 200)
+
+                    except Exception as e:
+                        return jsonify({'error': str(e)}), 500
+        
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
+        
 
 class User(Resource):
     @jwt_required()
@@ -175,10 +237,11 @@ class UserLogin(Resource):
                 return make_response(jsonify({"response":"Utilisateur introuvable"}), 404)  
             else:                    
                 if pwd_context.verify(str(body["password"]), user[0].password_hashed):
-                    access_token = create_access_token(identity=user[0].id, expires_delta=datetime.timedelta(days=1))
+                    access_token = create_access_token(identity=user[0].id, expires_delta=datetime.timedelta(days=1))                    
                     return make_response(jsonify({
                         "response":"User successfully logged",
-                        "token": access_token
+                        "token": access_token,
+                        "id": user[0].id
                         }), 200)  
                 else:
                     return make_response(jsonify({"response":"Email et mot de passe non compatibles"}), 401)  
@@ -334,6 +397,44 @@ class Model:
 
             # Sélection des meilleurs résultats
             result = recommandations[recommandations["Similarity"] > 0.5]
+
+            if result.empty:
+                print("Aucune recommandation disponible.")
+                return []
+
+            print(f"Recommandations générées avec succès pour la recherche '{search}'.\n")
+            formatted_result = []
+            for recom in result.itertuples(index=True, name=None):
+                formatted_result.append({
+                    "name" : recom[0],
+                    "score" : recom[1]
+                })
+      
+            return formatted_result
+        
+        except Exception as e:
+            print(f"Une erreur est survenue lors de la génération des recommandations : {e}")
+            return []
+
+    def custom_display(self, search):
+        try:
+            
+            # Récupération du vecteur du livre cible
+            search_vector = self.search_processing(search).reshape(1, -1)
+
+            # Calcul des similarités cosinus
+            similarities = self.topic_df.apply(
+                lambda x: cosine_similarity(search_vector, x.to_numpy().reshape(1, -1))[0][0], axis=1
+            )
+
+            # Conversion en DataFrame
+            recommandations = similarities.to_frame(name="Similarity")
+
+            # Tri décroissant des similarités
+            recommandations.sort_values(by="Similarity", ascending=False, inplace=True)
+
+            # Sélection des meilleurs résultats
+            result = recommandations
 
             if result.empty:
                 print("Aucune recommandation disponible.")
