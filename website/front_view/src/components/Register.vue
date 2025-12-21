@@ -81,7 +81,7 @@
           })
           
           if (response.status == 201){                        
-            this.$router.push("/")
+            this.$router.push("/login")
           }          
           
         } catch (error) {          
