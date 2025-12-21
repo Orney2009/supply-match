@@ -71,12 +71,6 @@
 
     methods:{
       async handleSubmit(){
-<<<<<<< HEAD
-          const response = await axios.post('login',{
-            email: this.email,
-            password:this.password,
-          })
-=======
         try {                    
           const response = await axios.post('login',{
             email: this.email,
@@ -85,13 +79,12 @@
           
           if (response.status == 200){            
             this.$cookies.set("token", response.data.token, "1d")
-            this.$router.push("/")
+            this.$router.push("/entreprises")
           }          
           
         } catch (error) {          
           this.result = error.response.data.response
         }
->>>>>>> e360f71 (fix: corrects error hanlding when logging)
 
       }
     }
