@@ -2,7 +2,7 @@ from flask import Flask, jsonify, make_response, request
 from flask_restful import Resource, Api
 from sqlalchemy.orm import joinedload
 from flask_sqlalchemy import SQLAlchemy
-from flask_jwt_extended import create_access_token, jwt_required
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from email_validator import validate_email, EmailNotValidError
 from passlib.apps import custom_app_context as pwd_context
 import datetime
@@ -33,11 +33,31 @@ current_session = get_session(engine)
 db = current_session()
 
 
+class Categories(Resource):
+    def get(self):
+        try:            
+            categories = db.query(Category).all()                        
+            cat_result = []                      
+            for category in categories:                
+                cat_result.append({
+                    'category_id': category.id,
+                    'name': category.name
+                })
+            
+            result = {
+                'categories' : cat_result,                
+            }
+
+            return make_response(jsonify(result), 200)
+
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+
+
 class Entreprises(Resource):
     def get(self):
         offset = request.args.get("offset")
-        limit = request.args.get("limit")
-        print(limit)
+        limit = request.args.get("limit")        
         try:
             entreprises = db.query(Entreprise, Category).join(Category, Entreprise.category_id == Category.id).offset(offset).limit(limit).all()                        
             ent_result = []            
@@ -51,9 +71,7 @@ class Entreprises(Resource):
                     'description': entreprise.description
 
                 })
-
             
-
             result = {
                 'entreprises' : ent_result,                
             }
@@ -64,21 +82,25 @@ class Entreprises(Resource):
             return jsonify({'error': str(e)}), 500
 
 class User(Resource):
-    def get(self):
-        entreprise_id = request.json.get("id")
-        try:
-            entreprise = db.query(objects.Entreprise).filter(objects.Entreprise.id == entreprise_id).all()
+    @jwt_required()
+    def get(self):        
+        # token = request.headers.get("Authorization")
+        current_user_id = get_jwt_identity()        
+        try:            
+            
+            entreprise = db.query(Entreprise, Category).join(Category, Entreprise.category_id == Category.id).filter(Entreprise.id == current_user_id).all()
             if len(entreprise) == 0 :
-                return make_response(jsonify({"response":"Entreprise not found"}), 404)  
-            else :
+                return make_response(jsonify({"response":"Entreprise introuvable"}), 404)  
+            else :                
                 result = {
-                    'entreprise_id': entreprise.id,
-                    'category_id': entreprise.category_id,
-                    'name': entreprise.name,
-                    'address': entreprise.address,
-                    'phone': entreprise.phone,
-                    'description': entreprise.description
-                }            
+                    'entreprise_id': entreprise[0][0].id,
+                    'category': entreprise[0][1].name,
+                    'name': entreprise[0][0].name,
+                    'address': entreprise[0][0].address,
+                    'phone': entreprise[0][0].phone,
+                    'description': entreprise[0][0].description
+                }     
+                     
 
             return make_response(jsonify(result), 200)
 
@@ -90,7 +112,21 @@ class User(Resource):
 
     @jwt_required()
     def put(self):
-        return make_response(jsonify({"response":"protected ressource"}), 200)
+        data = request.json
+        print(data)
+        current_user_id = get_jwt_identity()
+        entreprise = db.get(Entreprise, current_user_id)
+
+        entreprise.name = data["name"]
+        entreprise.phone = data["phone"]
+        entreprise.category_id = data["category_id"]
+        entreprise.address = data["address"]
+        entreprise.description = data["description"]
+
+        db.commit()
+        
+
+        return make_response(jsonify({"response":"Profil mis a jour"}), 200)
 
 
 class UserRegistration(Resource):
@@ -102,9 +138,9 @@ class UserRegistration(Resource):
             user = db.query(objects.Entreprise).filter(objects.Entreprise.email == body["email"]).all()
                
             if (body["password"] != body["c_password"]) or body["password"] is None :
-                return make_response(jsonify({"response":"The passwords doesn't match or are empty"}), 400)                                
+                return make_response(jsonify({"response":"Les mots de passe sont vides ou différents"}), 400)                                
             elif len(user) != 0:
-                return make_response(jsonify({"response":"This email is already taken"}), 400)                                
+                return make_response(jsonify({"response":"Cet email est déja pris"}), 400)                                
 
             else:
                 db.add(
@@ -120,10 +156,10 @@ class UserRegistration(Resource):
                 )
                 db.commit()
                 db.close()
-                return make_response(jsonify({"response":"User created"}), 201)
+                return make_response(jsonify({"response":"Utilisateur créé"}), 201)
 
         except EmailNotValidError as e:
-            return make_response(jsonify({"response":"Invalid email"}), 401)
+            return make_response(jsonify({"response":"Email invalide"}), 401)
 
         except Exception as e:
             print(f"Something went wrong: {e}")
@@ -136,7 +172,7 @@ class UserLogin(Resource):
             user = db.query(objects.Entreprise).filter(objects.Entreprise.email == body["email"]).all()
                                     
             if len(user) == 0:
-                return make_response(jsonify({"response":"User not found"}), 404)  
+                return make_response(jsonify({"response":"Utilisateur introuvable"}), 404)  
             else:                    
                 if pwd_context.verify(str(body["password"]), user[0].password_hashed):
                     access_token = create_access_token(identity=user[0].id, expires_delta=datetime.timedelta(days=1))
@@ -145,11 +181,11 @@ class UserLogin(Resource):
                         "token": access_token
                         }), 200)  
                 else:
-                    return make_response(jsonify({"response":"Email and password don't match"}), 401)  
+                    return make_response(jsonify({"response":"Email et mot de passe non compatibles"}), 401)  
 
 
         except EmailNotValidError as e:
-            return make_response(jsonify({"response":"Invalid email"}), 400)
+            return make_response(jsonify({"response":"Email invalide"}), 400)
 
         except Exception as e:
             print(f"Something went wrong: {e}")

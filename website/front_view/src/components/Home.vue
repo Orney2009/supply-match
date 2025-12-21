@@ -1,7 +1,7 @@
 <template>
   <Navbar/> 
   <Searchbar @search="searchEntreprises"/>  
-  <Enterprises :entreprises=paginatedEntreprises :categories=categories />
+  <Enterprises :entreprises=paginatedEntreprises />
    
   <div class="flex justify-center mt-6">
     <vue-awesome-paginate
@@ -54,10 +54,8 @@ const searchEntreprises = async (query) => {
 const fetchEntreprises = async () => {
   try {
     const response = await api.get("/");
-
-    console.log(response.data)
-    entreprises.value = response.data.entreprises;
-    categories.value = response.data.categories;
+    
+    entreprises.value = response.data.entreprises;    
 
 
 
