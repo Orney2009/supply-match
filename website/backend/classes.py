@@ -201,13 +201,13 @@ class Recommandations(Resource):
         names = [recom["name"] for recom in re]
         
         try:
-            
-            entreprises = db.query(objects.Entreprise).filter(objects.Entreprise.name.in_(names)).all()
+            entreprises = db.query(Entreprise, Category).join(Category, Entreprise.category_id == Category.id).filter(objects.Entreprise.name.in_(names)).all()
+            # entreprises = db.query(objects.Entreprise).filter(objects.Entreprise.name.in_(names)).all()
             result = []
-            for entreprise in entreprises:                
+            for entreprise, category in entreprises:                
                 result.append({
                     'entreprise_id': entreprise.id,
-                    'category_id': entreprise.category_id,
+                    'category': category.name,
                     'name': entreprise.name,
                     'address': entreprise.address,
                     'phone': entreprise.phone,
