@@ -89,13 +89,13 @@ class Entreprises(Resource):
             try:                          
                 model = Model()
                 user = db.query(Entreprise, Category).join(Category, Entreprise.category_id == Category.id).filter(Entreprise.id == current_user_id).all()[0]
-                re = model.custom_display(user[0].description)
+                re = model.custom_display(user[0].description)                
                 names = [recom["name"] for recom in re]
-                if len(names) != 0:                     
+                if len(names) != 0:
                     ent_result = []
                     for name in names:
-                        _entreprise = db.query(Entreprise, Category).join(Category, Entreprise.category_id == Category.id).filter(objects.Entreprise.name == name).all()
-                        for entreprise, category in _entreprise: 
+                        entreprises = db.query(Entreprise, Category).join(Category, Entreprise.category_id == Category.id).filter(objects.Entreprise.name == name).all()
+                        for entreprise, category in entreprises:
                             ent_result.append({
                                 'entreprise_id': entreprise.id,
                                 'category': category.name,
@@ -420,33 +420,34 @@ class Model:
         try:
             
             # Récupération du vecteur du livre cible
-            search_vector = self.search_processing(search).reshape(1, -1)
-
-            # Calcul des similarités cosinus
-            similarities = self.topic_df.apply(
-                lambda x: cosine_similarity(search_vector, x.to_numpy().reshape(1, -1))[0][0], axis=1
-            )
-
-            # Conversion en DataFrame
-            recommandations = similarities.to_frame(name="Similarity")
-
-            # Tri décroissant des similarités
-            recommandations.sort_values(by="Similarity", ascending=False, inplace=True)
-
-            # Sélection des meilleurs résultats
-            result = recommandations
-
-            if result.empty:
-                print("Aucune recommandation disponible.")
-                return []
-
-            print(f"Recommandations générées avec succès pour la recherche '{search}'.\n")
             formatted_result = []
-            for recom in result.itertuples(index=True, name=None):
-                formatted_result.append({
-                    "name" : recom[0],
-                    "score" : recom[1]
-                })
+            if search != " ":
+                search_vector = self.search_processing(search).reshape(1, -1)
+
+                # Calcul des similarités cosinus
+                similarities = self.topic_df.apply(
+                    lambda x: cosine_similarity(search_vector, x.to_numpy().reshape(1, -1))[0][0], axis=1
+                )
+
+                # Conversion en DataFrame
+                recommandations = similarities.to_frame(name="Similarity")
+
+                # Tri décroissant des similarités
+                recommandations.sort_values(by="Similarity", ascending=False, inplace=True)
+
+                # Sélection des meilleurs résultats
+                result = recommandations
+
+                if result.empty:
+                    print("Aucune recommandation disponible.")
+                    return []
+
+                print(f"Recommandations générées avec succès pour la recherche '{search}'.\n")                
+                for recom in result.itertuples(index=True, name=None):
+                    formatted_result.append({
+                        "name" : recom[0],
+                        "score" : recom[1]
+                    })
       
             return formatted_result
         

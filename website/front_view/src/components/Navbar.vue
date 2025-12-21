@@ -60,6 +60,7 @@
 
   const logout = () =>{
     $cookies.remove("token") 
+    $cookies.remove("id") 
     cookie.value = ""
   }
 
