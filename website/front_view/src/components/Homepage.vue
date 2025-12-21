@@ -16,7 +16,7 @@
             Que vous soyez entrepreneur, investisseur ou particulier, notre plateforme est votre alliée pour réussir.
           </p>
 
-          <router-link to="/profile"
+          <router-link to="/register"
             class="inline-block bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-300 transition">
             Créer votre profil
           </router-link>
