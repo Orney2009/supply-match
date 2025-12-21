@@ -17,7 +17,7 @@ class Entreprise(Base):
     address = Column(String, nullable=False)
     phone = Column(String, nullable=False)
     description = Column(String)
-    category_id = Column(Integer, ForeignKey('categories.id'), onupdate='CASCADE')
+    category_id = Column(Integer, ForeignKey('categories.id'))
     password_hashed = Column(String)
     email = Column(String)
 

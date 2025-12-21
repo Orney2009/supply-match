@@ -17,6 +17,7 @@ jwt = JWTManager(app)
 api.add_resource(Entreprises, '/')
 api.add_resource(UserLogin, '/login')
 api.add_resource(User, '/entreprise')
+api.add_resource(Categories, '/categories')
 api.add_resource(UserRegistration, '/register')
 api.add_resource(Recommandations, '/search')
 

@@ -6,14 +6,34 @@
         <li><a href="#" class="hover:text-blue-600">Entreprises</a></li>
         <li><a href="#" class="hover:text-blue-600">Contact</a></li>
         </ul>
-        <div class="flex items-center lg:order-2">
-           <!-- <a href="#" class="text-gray-800 dark:text-white hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2">Log in</a> -->
-            <router-link to="/login" class="text-blue-600 hover:underline" >
-              Log in
+        <div v-if=cookie class="flex items-center lg:order-2">           
+            <router-link to="/profile" class="mr-3  text-blue-600 hover:underline" >
+              Modifier mon profil
             </router-link>
+            <router-link v-on:click=logout to="/" class="text-blue-600 hover:underline cursor-btn" >
+              Se déconnecter
+            </router-link>
+        </div>
+        <div v-else>
+          <router-link to="/login" class="mr-3  text-blue-600 hover:underline" >
+              Se connecter
+            </router-link>
+            <router-link to="/register" class="text-blue-600 hover:underline" >
+              S'inscrire
+            </router-link>            
         </div>
   </nav>
 </template>
 
 <script setup>
+
+  import { ref } from 'vue';  
+  const cookie = ref("")
+  cookie.value = $cookies.get("token")
+
+  const logout = () =>{
+    $cookies.remove("token") 
+    cookie.value = ""
+  }
+
 </script>
