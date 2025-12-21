@@ -3,10 +3,12 @@ import Login from "./components/Login.vue";
 import Register from "./components/Register.vue";
 import Home from "./components/Home.vue";
 import Profile from "./components/Profile.vue";
+import Homepage from "./components/Homepage.vue";
 
 export const routes = [
-    { path:'/',component: Home },
+    { path:'/entreprises',component: Home },
     { path:'/login',component: Login },
     { path:'/register',component: Register },
-    { path:'/profile',component: Profile }
+    { path:'/profile',component: Profile },
+    { path:'/',component: Homepage }
 ]

@@ -79,7 +79,8 @@
           
           if (response.status == 200){            
             this.$cookies.set("token", response.data.token, "1d")
-            this.$router.push("/")
+            this.$cookies.set("id", response.data.id, "1d")
+            this.$router.push("/entreprises")
           }          
           
         } catch (error) {          
